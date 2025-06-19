@@ -9,16 +9,30 @@ export default function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const predefinedTags = [
+    "network",
+    "printer",
+    "server",
+    "vpn",
+    "software",
+    "hardware",
+    "database",
+    "urgent",
+  ];
+
   const [editingIndex, setEditingIndex] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [activeTag, setActiveTag] = useState("All");
 
+  // Generate all tags including "All"
   const allTags = [
     "All",
-    ...new Set(
-      bookmarks
-        .flatMap((b) => b.tags.split(",").map((t) => t.trim()))
-        .filter((t) => t !== "")
+    ...Array.from(
+      new Set(
+        bookmarks
+          .flatMap((b) => b.tags.split(",").map((t) => t.trim()))
+          .filter((t) => t !== "")
+      )
     ),
   ];
 
@@ -26,6 +40,7 @@ export default function App() {
     localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
   }, [bookmarks]);
 
+  // Add or update bookmark
   const addOrUpdateBookmark = (bookmark) => {
     if (editingIndex !== null) {
       const updated = [...bookmarks];
@@ -37,6 +52,23 @@ export default function App() {
     }
   };
 
+  // Delete bookmark by index
+  const deleteBookmark = (index) => {
+    const newBookmarks = bookmarks.filter((_, i) => i !== index);
+    setBookmarks(newBookmarks);
+  };
+
+  // Start editing a bookmark
+  const startEditBookmark = (index) => {
+    setEditingIndex(index);
+  };
+
+  // Cancel editing
+  const cancelEdit = () => {
+    setEditingIndex(null);
+  };
+
+  // Filtering bookmarks based on search text and active tag
   const filteredBookmarks = bookmarks.filter((b) => {
     const matchesSearch =
       b.label.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -52,70 +84,50 @@ export default function App() {
     return matchesSearch && matchesTag;
   });
 
-  const deleteBookmark = (index) => {
-    const newBookmarks = bookmarks.filter((_, i) => i !== index);
-    setBookmarks(newBookmarks);
-  };
-
-  const startEditBookmark = (index) => {
-    setEditingIndex(index);
-  };
-
   return (
-    <div className="container">
-      <h1>🔗 IP & Tools Bookmarking App</h1>
-      <input
-        type="text"
-        placeholder="Search bookmarks by label or tags..."
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        style={{ width: "100%", padding: "0.5rem", marginBottom: "1rem" }}
-      />
-      <BookmarkForm
-        onAdd={addOrUpdateBookmark}
-        editingBookmark={editingIndex !== null ? bookmarks[editingIndex] : null}
-        cancelEdit={() => setEditingIndex(null)}
-      />
-      <div style={{ marginBottom: "1rem" }}>
-        {allTags.map((tag) => (
-          <button
-            key={tag}
-            onClick={() => setActiveTag(tag)}
-            style={{
-              marginRight: "8px",
-              backgroundColor: activeTag === tag ? "#0077cc" : "#ddd",
-              color: activeTag === tag ? "#fff" : "#000",
-              border: "none",
-              borderRadius: "4px",
-              padding: "5px 10px",
-              cursor: "pointer",
-            }}
-          >
-            {tag}
-          </button>
-        ))}
+    <div className="main-layout">
+      <div className="sidebar">
+        <h1>IP & Tools</h1>
+        <BookmarkForm
+          onAdd={addOrUpdateBookmark}
+          editingBookmark={
+            editingIndex !== null ? bookmarks[editingIndex] : null
+          }
+          cancelEdit={cancelEdit}
+          predefinedTags={predefinedTags}
+        />
       </div>
 
-      <BookmarkList
-        bookmarks={filteredBookmarks}
-        onDelete={deleteBookmark}
-        onEdit={startEditBookmark}
-      />
+      <div className="content">
+        <input
+          type="text"
+          placeholder="Search bookmarks..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
 
-      <button
-        onClick={() => exportToCSV(bookmarks)}
-        style={{
-          marginBottom: "1rem",
-          backgroundColor: "#28a745",
-          color: "white",
-          border: "none",
-          padding: "8px 16px",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        📤 Export CSV
-      </button>
+        <div className="tag-filter">
+          {allTags.map((tag) => (
+            <button
+              key={tag}
+              className={`tag-btn ${activeTag === tag ? "active" : ""}`}
+              onClick={() => setActiveTag(tag)}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+
+        <button className="export-btn" onClick={() => exportToCSV(bookmarks)}>
+          📤 Export CSV
+        </button>
+
+        <BookmarkList
+          bookmarks={filteredBookmarks}
+          onDelete={deleteBookmark}
+          onEdit={startEditBookmark}
+        />
+      </div>
     </div>
   );
 }

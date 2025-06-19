@@ -1,71 +1,116 @@
 import React, { useState, useEffect } from "react";
 
-export default function BookmarkForm({ onAdd, editingBookmark, cancelEdit }) {
+export default function BookmarkForm({
+  onAdd,
+  editingBookmark,
+  cancelEdit,
+  predefinedTags,
+}) {
   const [label, setLabel] = useState("");
-  const [url, setUrl] = useState("");
-  const [tags, setTags] = useState("");
-  const [notes, setNotes] = useState("");
+  const [ip, setIp] = useState("");
+  const [tags, setTags] = useState([]); // store tags as array
+  const [customTagInput, setCustomTagInput] = useState("");
 
+  // Fill form if editing
   useEffect(() => {
     if (editingBookmark) {
       setLabel(editingBookmark.label);
-      setUrl(editingBookmark.url);
-      setTags(editingBookmark.tags);
-      setNotes(editingBookmark.notes);
+      setIp(editingBookmark.ip);
+      setTags(editingBookmark.tags || []);
     } else {
       setLabel("");
-      setUrl("");
-      setTags("");
-      setNotes("");
+      setIp("");
+      setTags([]);
     }
   }, [editingBookmark]);
 
+  // Toggle predefined tag selection
+  const toggleTag = (tag) => {
+    if (tags.includes(tag)) {
+      setTags(tags.filter((t) => t !== tag));
+    } else {
+      setTags([...tags, tag]);
+    }
+  };
+
+  // Add custom tag on Enter or comma
+  const addCustomTag = (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const newTag = customTagInput.trim().toLowerCase();
+      if (newTag && !tags.includes(newTag)) {
+        setTags([...tags, newTag]);
+      }
+      setCustomTagInput("");
+    }
+  };
+
+  // Submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAdd({ label, url, tags, notes });
-    if (!editingBookmark) {
-      // Clear form on add
-      setLabel("");
-      setUrl("");
-      setTags("");
-      setNotes("");
-    }
+    if (!label || !ip) return alert("Label and IP are required");
+    onAdd({
+      label,
+      ip,
+      tags,
+    });
+    // clear form
+    setLabel("");
+    setIp("");
+    setTags([]);
   };
 
   return (
     <form onSubmit={handleSubmit} className="form">
-      <input
-        placeholder="Label (e.g., NAS Panel)"
-        value={label}
-        onChange={(e) => setLabel(e.target.value)}
-        required
-      />
-      <input
-        placeholder="URL/IP (e.g., http://192.168.0.30:5000)"
-        value={url}
-        onChange={(e) => setUrl(e.target.value)}
-        required
-      />
-      <input
-        placeholder="Tags (e.g., storage, switch)"
-        value={tags}
-        onChange={(e) => setTags(e.target.value)}
-      />
-      <textarea
-        placeholder="Notes (optional)"
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-      />
-      <button type="submit">{editingBookmark ? "Save" : "Add"} Bookmark</button>
-      {editingBookmark && (
-        <button
-          type="button"
-          onClick={cancelEdit}
-          style={{ marginLeft: "10px" }}
-        >
-          Cancel
-        </button>
-      )}
+      <div className="form-group full">
+        <label>Label</label>
+        <input
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          placeholder="e.g. Office Printer"
+        />
+      </div>
+
+      <div className="form-group full">
+        <label>IP Address / Link</label>
+        <input
+          value={ip}
+          onChange={(e) => setIp(e.target.value)}
+          placeholder="e.g. 192.168.1.15"
+        />
+      </div>
+
+      <div className="form-group full">
+        <label>Tags (click to select, or add custom)</label>
+        <div className="tag-selector">
+          {predefinedTags.map((tag) => (
+            <button
+              type="button"
+              key={tag}
+              className={`tag-btn ${tags.includes(tag) ? "active" : ""}`}
+              onClick={() => toggleTag(tag)}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+        <input
+          type="text"
+          placeholder="Add custom tag and press Enter"
+          value={customTagInput}
+          onChange={(e) => setCustomTagInput(e.target.value)}
+          onKeyDown={addCustomTag}
+        />
+      </div>
+
+      <div className="form-actions">
+        <button type="submit">{editingBookmark ? "Update" : "Add"}</button>
+        {editingBookmark && (
+          <button type="button" className="cancel-btn" onClick={cancelEdit}>
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   );
 }
