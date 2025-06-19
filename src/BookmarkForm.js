@@ -10,6 +10,7 @@ export default function BookmarkForm({
   const [ip, setIp] = useState("");
   const [tags, setTags] = useState([]); // store tags as array
   const [customTagInput, setCustomTagInput] = useState("");
+  const [notes, setNotes] = useState("");
 
   // Fill form if editing
   useEffect(() => {
@@ -17,10 +18,12 @@ export default function BookmarkForm({
       setLabel(editingBookmark.label);
       setIp(editingBookmark.ip);
       setTags(editingBookmark.tags || []);
+      setNotes(editingBookmark.notes || "");
     } else {
       setLabel("");
       setIp("");
       setTags([]);
+      setNotes("");
     }
   }, [editingBookmark]);
 
@@ -53,11 +56,13 @@ export default function BookmarkForm({
       label,
       ip,
       tags,
+      notes,
     });
     // clear form
     setLabel("");
     setIp("");
     setTags([]);
+    setNotes("");
   };
 
   return (
@@ -77,6 +82,15 @@ export default function BookmarkForm({
           value={ip}
           onChange={(e) => setIp(e.target.value)}
           placeholder="e.g. 192.168.1.15"
+        />
+      </div>
+
+      <div className="form-group full">
+        <label>Notes:</label>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Add any notes here..."
         />
       </div>
 

@@ -1,21 +1,22 @@
-// src/utils/exportToCSV.js
-export function exportToCSV(bookmarks) {
-  const headers = ["Label", "URL", "Tags", "Notes"];
-  const rows = bookmarks.map((b) => [b.label, b.url, b.tags, b.notes]);
+export const exportToCSV = (bookmarks) => {
+  const csvRows = [
+    ["Label", "IP", "Tags", "Notes"], // Added Notes header
+    ...bookmarks.map((bookmark) => [
+      bookmark.label,
+      bookmark.ip,
+      `"${bookmark.tags.join(",")}"`, // Tags wrapped in quotes
+      `"${bookmark.notes ? bookmark.notes.replace(/"/g, '""') : ""}"`, // Notes wrapped and quotes escaped
+    ]),
+  ];
 
-  let csvContent =
-    "data:text/csv;charset=utf-8," +
-    [headers, ...rows]
-      .map((e) =>
-        e.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
-      )
-      .join("\n");
+  const csvContent = csvRows.map((row) => row.join(",")).join("\n");
 
-  const encodedUri = encodeURI(csvContent);
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
+  link.href = url;
   link.setAttribute("download", "bookmarks.csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-}
+};

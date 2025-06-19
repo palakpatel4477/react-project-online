@@ -8,12 +8,13 @@ export default function BookmarkList({ bookmarks, onDelete, onEdit }) {
           <h3>{b.label}</h3>
           <p>
             <strong>URL:</strong>{" "}
-            <a href={b.url} target="_blank" rel="noreferrer">
-              {b.url}
+            <a href={b.ip} target="_blank" rel="noreferrer">
+              {b.ip}
             </a>
           </p>
           <p>
-            <strong>Tags:</strong> {b.tags}
+            <strong>Tags:</strong>{" "}
+            {Array.isArray(b.tags) ? b.tags.join(", ") : b.tags}
           </p>
           <p>
             <strong>Notes:</strong> {b.notes}
