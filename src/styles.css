@@ -1,4 +1,42 @@
-.App {
+/* src/styles.css */
+body {
   font-family: sans-serif;
+  padding: 1rem;
+  background-color: #f4f4f4;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+
+h1 {
   text-align: center;
+}
+
+.form input,
+.form textarea {
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+}
+
+.form button {
+  padding: 0.5rem 1rem;
+  margin-top: 0.5rem;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.card {
+  background: #eef;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  border-radius: 8px;
 }
