@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/react-project-online/static/css/main.55837e82.css",
+    "main.js": "/react-project-online/static/js/main.dab3ef1e.js",
+    "index.html": "/react-project-online/index.html",
+    "main.55837e82.css.map": "/react-project-online/static/css/main.55837e82.css.map",
+    "main.dab3ef1e.js.map": "/react-project-online/static/js/main.dab3ef1e.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.55837e82.css",
+    "static/js/main.dab3ef1e.js"
+  ]
+}
